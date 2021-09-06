@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:customfontdemo="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="activity"
+            type="com.nic.tnsec.activity.LoginScreen" />
+    </data>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg"
+        >
+        <RelativeLayout
+            android:background="@drawable/bottom_curved_color_bg"
+            android:id="@+id/img_rll"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:background="@color/bg"
+                ></ImageView>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_centerVertical="true"
+                android:id="@+id/relative1"
+                >
+                <ImageView
+                    android:id="@+id/ivIlls"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@mipmap/app_logo" />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:background="@android:color/transparent"
+            android:id="@+id/below_bg"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentBottom="true"
+            >
+
+            <RelativeLayout
+                android:id="@+id/tv_version_nic_name_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <TextView
+                    android:id="@+id/tv_version_number"
+                    style="@style/font_poppins_semibold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Version 1"
+                    android:textAlignment="center"
+                    android:textColor="@color/grey4"
+                    android:textSize="@dimen/_15sdp" />
+
+                <TextView
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@+id/tv_version_number"
+                    android:id="@+id/nic_name"
+                    android:paddingTop="@dimen/_8sdp"
+                    android:paddingBottom="@dimen/_8sdp"
+                    android:layout_centerVertical="true"
+                    style="@style/font_poppins_semibold"
+                    android:layout_width="match_parent"
+                    android:background="@color/colorPrimary"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="Sofware Designed &amp; Developed by NIC"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/_15sdp" />
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/img_rll"
+            android:layout_above="@+id/below_bg">
+            <ScrollView
+                android:visibility="visible"
+                android:id="@+id/scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_gravity="center"
+                                android:id="@+id/dpt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:text="Tamil Nadu State Election Commission"
+                                android:textColor="@color/grey4"
+                                android:textSize="17sp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginBottom="10dp"
+                                android:textStyle="bold"
+                                customfontdemo:fontName="@string/font_circular_medium" />
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/submit_layout"
+                                android:layout_below="@+id/dpt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:visibility="visible"
+                                android:elevation="10dp"
+                                app:cardBackgroundColor="#fcfcfc"
+                                app:cardCornerRadius="10dp"
+                                android:background="@drawable/cornered_bg"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="10dp"
+                                app:cardElevation="10dp"
+                                app:cardPreventCornerOverlap="false"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="20dp"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="10dp"
+                                            android:layout_marginEnd="10dp"                                    android:layout_marginTop="10dp"
+                                            android:text="username"
+                                            android:textColor="@android:color/darker_gray"
+                                            android:textSize="15sp"
+                                            android:visibility="visible"
+                                            customfontdemo:fontName="@string/font_circular_medium" />
+
+                                        <LinearLayout
+                                            android:id="@+id/ivItemOne"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="10dp"
+                                            android:layout_marginEnd="10dp"
+                                            android:layout_marginTop="10dp"
+                                            android:orientation="horizontal">
+
+
+                                            <RelativeLayout
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/white_background_two_corners"
+                                                android:orientation="vertical">
+
+                                                <com.google.android.material.textfield.TextInputLayout
+                                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    app:hintEnabled="false"
+                                                    android:id="@+id/userNameTXINP"
+                                                    android:background="@android:color/white"
+                                                    app:boxStrokeColor="@android:color/white"
+                                                    android:layout_toLeftOf="@+id/user_img"
+                                                    app:boxStrokeWidth="0dp"
+                                                    app:boxStrokeWidthFocused="0dp"
+                                                    app:boxBackgroundColor="@android:color/transparent"
+                                                    android:padding="0dp"
+                                                    android:hint="Username">
+
+                                                    <com.google.android.material.textfield.TextInputEditText
+                                                        android:id="@+id/username"
+                                                        android:layout_width="match_parent"
+                                                        android:layout_height="40dp"
+                                                        android:background="@android:color/transparent"
+                                                        android:inputType="textPersonName"
+                                                        android:padding="0dp"
+                                                        android:hint="Username"
+                                                        />
+
+                                                </com.google.android.material.textfield.TextInputLayout>
+
+
+
+                                                <ImageView
+                                                    android:id="@+id/user_img"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_alignParentEnd="true"
+                                                    android:layout_centerVertical="true"
+                                                    android:layout_margin="5dp"
+                                                    android:background="@drawable/usernamebg" />
+
+
+                                            </RelativeLayout>
+
+                                        </LinearLayout>
+
+
+                                    </LinearLayout>
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="30dp"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="10dp"
+                                            android:layout_marginEnd="10dp"                                    android:layout_marginTop="10dp"
+                                            android:text="password"
+                                            android:textColor="@android:color/darker_gray"
+                                            android:textSize="15sp"
+                                            android:visibility="visible"
+                                            customfontdemo:fontName="@string/font_circular_medium" />
+
+                                        <LinearLayout
+                                            android:id="@+id/ivItemTwo"
+                                            android:layout_below="@+id/ivItemOne"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="10dp"
+                                            android:layout_marginEnd="10dp"
+                                            android:layout_marginTop="10dp"
+                                            android:orientation="horizontal">
+
+
+                                            <RelativeLayout
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/white_background_two_corners"
+                                                android:orientation="vertical">
+
+                                                <com.google.android.material.textfield.TextInputLayout
+                                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    app:endIconMode="password_toggle"
+                                                    android:hint="password"
+                                                    app:hintEnabled="false"
+                                                    android:background="@android:color/white"
+                                                    app:boxStrokeColor="@android:color/white"
+                                                    app:boxStrokeWidth="0dp"
+                                                    app:boxStrokeWidthFocused="0dp"
+                                                    app:boxBackgroundColor="@android:color/transparent"
+                                                    android:padding="0dp"
+                                                    android:textColor="@android:color/black">
+
+                                                    <com.google.android.material.textfield.TextInputEditText
+                                                        android:id="@+id/password"
+                                                        android:layout_width="match_parent"
+                                                        android:layout_height="40dp"
+                                                        android:background="@android:color/transparent"
+                                                        android:padding="0dp"
+                                                        android:longClickable="false"
+                                                        android:hint="Password"
+                                                        android:inputType="textPassword"/>
+
+                                                </com.google.android.material.textfield.TextInputLayout>
+
+
+                                            </RelativeLayout>
+
+
+                                        </LinearLayout>
+
+
+                                    </LinearLayout>
+
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cornered_bg_circle"
+                            android:gravity="center"
+                            android:onClick="@{()-> activity.checkLoginScreen()}"
+                            android:elevation="3dp"
+                            android:layout_marginTop="-35dp">
+                            <ImageView
+                                android:id="@+id/btnBuy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="15dp"
+                                android:visibility="visible"
+                                android:background="@drawable/button_background"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/white"
+                                android:padding="@dimen/_7sdp"
+                                android:rotation="360"
+                                android:layout_centerHorizontal="true"
+                                android:layout_gravity="center"
+                                android:textAllCaps="true"
+                                android:textColor="@android:color/white" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </RelativeLayout>
+
+
+        ////Progress Bar
+        <RelativeLayout
+            android:visibility="gone"
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent">
+            <RelativeLayout
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="85dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp">
+                <ImageView
+                    android:id="@+id/spinnerImageView"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentTop="true"
+                    />
+
+                <TextView
+                    android:id="@+id/message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerInParent="true"
+                    android:text="Loading..."
+                    android:textSize="15sp"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    />
+            </RelativeLayout>
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+</layout>

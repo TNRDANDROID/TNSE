@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="activity"
+            type="com.nic.tnsec.activity.SplashScreen" />
+    </data>
+
+    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activity.SplashScreen">
+        <ImageView
+            android:id="@+id/ivSplash"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_gradient" />
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/_20sdp">
+
+
+        <ImageView
+            android:id="@+id/ivlogo"
+            android:lineSpacingExtra="8dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:background="@mipmap/app_logo"
+            android:textColor="#FFF"
+            android:visibility="gone"
+            android:textSize="22sp"/>
+
+
+            <TextView
+                android:id="@+id/ivSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ivlogo"
+                android:text="TNSEC"
+                style="@style/font_poppins_regular"
+                android:layout_centerInParent="true"
+                android:gravity="center_horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="#FFF"
+                android:textSize="36sp"
+                />
+         </RelativeLayout>
+
+
+    </RelativeLayout>
+</layout>

@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">TNSEC</string>
+    <string name="font_circular_bold">circular-bold.ttf</string>
+    <string name="font_circular_book">circular-book.ttf</string>
+    <string name="font_circular_medium">circular-medium.ttf</string>
+    <string name="font_normal">din_pro_light.otf</string>
+    <string name="font_poppins_regular">Poppins-Regular.ttf</string>
+    <string name="font_poppins_semibold">Poppins-SemiBold.ttf</string>
+    <string name="font_poppins_medium">Poppins-Medium.ttf</string>
+    <string name="font_poppins_light">Poppins-Light.ttf</string>
+    <string name="font_poppins_bold">Poppins-Bold.ttf</string>
+    <string name="init_vector">2SN22SkJGDyOAXUU</string>
+    <string name="no_internet">Your internet seems to be offline!</string>
+    <string name="achanthi_sundar_m">Achanthi Sundar M</string>
+
+
+    <string-array name="cat_textfield_exposed_dropdown_content" translatable="false">
+        <item>Panchayat Union</item>
+        <item>Municipality</item>
+        <item>Town Panchayat</item>
+        <item>Corporation</item>
+    </string-array>
+
+</resources>
