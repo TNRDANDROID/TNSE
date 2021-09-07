@@ -17,7 +17,7 @@ android {
             def version = variant.versionName
             def date = new Date()
             def formattedDate = date.format('ddMMyy')
-            outputFileName = "TNSEC${variant.buildType.name}_v${version}_${formattedDate}.apk"
+            outputFileName = "Polling_Personnel${variant.buildType.name}_v${version}_${formattedDate}.apk"
         }
     }
     buildTypes {
@@ -42,8 +42,8 @@ android {
             minifyEnabled false
             shrinkResources false
             signingConfig signingConfigs.debug
-            resValue "string", "LOGIN_URL", "http://www.tnsec.tn.nic.in/eroll/project/webservices_forms/login_service/login_services.php"
-            resValue "string", "APP_MAIN_SERVICES_URL", "http://www.tnsec.tn.nic.in/eroll/project_main/webservices_forms/ro_user_list/ro_details.php"
+            resValue "string", "LOGIN_URL", "https://tnsec.tn.nic.in/lbe2021/project_main/webservices_forms/login_service/login_services.php"
+            resValue "string", "APP_MAIN_SERVICES_URL", "https://tnsec.tn.nic.in/lbe2021/project_main/webservices_forms/randomization/pp_random.php"
             resValue "string", "TNRD_HOST_NAME", "tnsec.tn.nic.in"
             resValue "string", "SUB_DOMAIN", "www.tnsec.tn.nic.in"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

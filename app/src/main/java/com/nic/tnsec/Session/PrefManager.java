@@ -42,7 +42,7 @@ public class PrefManager {
     private static final String KEY_VILLAGE_LIST_PV_NAME = "Village_List_Pv_Name";
     private static final String KEY_DESIGNATION = "Designation";
     private static final String KEY_NAME = "Name";
-
+    public static final String SERVER_DATA_LIST = "ServerDataList";
 
     public PrefManager(Context context) {
         this._context = context;
@@ -88,7 +88,14 @@ public class PrefManager {
 
 
 
+    public void setServerDataList(Context context, String activityList) {
+        editor.putString(SERVER_DATA_LIST, activityList);
+        editor.apply();
+    }
 
+    public String getServerDataList(Context context) {
+            return pref.getString(SERVER_DATA_LIST, "");
+    }
     public Object setDesignation(Object key) {
         editor.putString(KEY_DESIGNATION, String.valueOf(key));
         editor.commit();

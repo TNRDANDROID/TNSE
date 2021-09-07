@@ -82,6 +82,7 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/padding"
     android:id="@+id/details_layout"
     android:layout_below="@+id/app_bar"
     android:layout_above="@+id/save">
@@ -226,24 +227,31 @@
                     android:src="@drawable/check"></ImageView>
             </RelativeLayout>
 
-
-            <LinearLayout
-                android:id="@+id/details"
+            <androidx.cardview.widget.CardView
+                android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/details"
                 android:layout_below="@+id/validate_rl"
+                android:elevation="5dp"
+                android:layout_margin="@dimen/_20sdp"
+                app:cardCornerRadius="10dp"
+                >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
 
                 <LinearLayout
                     android:id="@+id/district_user_layout"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginTop="@dimen/_15sdp"
-                    android:background="@drawable/white_background_two_corners"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/padding"
                     android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
                     android:padding="@dimen/_5sdp">
 
 
@@ -253,8 +261,9 @@
                         android:layout_gravity="center_vertical"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
+                        android:gravity="center_vertical"
                         android:text="Name : "
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/grey_9"
                         android:textSize="18sp"
                         android:textStyle="normal" />
 
@@ -265,8 +274,9 @@
                         android:layout_gravity="left"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
+                        android:gravity="center_vertical"
                         android:text="Kanchipuram"
-                        android:textColor="@android:color/white"
+                        android:textColor="@android:color/black"
                         android:textSize="18sp"
                         android:textStyle="normal" />
 
@@ -277,10 +287,11 @@
                 <LinearLayout
                     android:id="@+id/block_user_layout"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="@dimen/_15sdp"
-                    android:layout_weight="1"
-                    android:background="@drawable/white_background_two_corners"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginBottom="@dimen/padding"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="@dimen/_5sdp">
 
@@ -290,9 +301,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:paddingLeft="5dp"
+                        android:gravity="center_vertical"
                         android:paddingRight="5dp"
-                        android:text="Designation : "
-                        android:textColor="@android:color/white"
+                        android:text="Orgnaisation : "
+                        android:textColor="@color/grey_9"
                         android:textSize="18sp"
                         android:textStyle="normal" />
 
@@ -301,10 +313,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="left"
+                        android:gravity="center_vertical"
+
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="Kanchipuram"
-                        android:textColor="@android:color/white"
+                        android:textColor="@android:color/black"
                         android:textSize="18sp"
                         android:textStyle="normal" />
 
@@ -313,9 +327,9 @@
 
 
             </LinearLayout>
-
+            </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView
-                android:visibility="gone"
+                android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/emp_photo_view"
@@ -375,6 +389,39 @@
         </RelativeLayout>
 
     </androidx.core.widget.NestedScrollView>
+    <RelativeLayout
+        android:id="@+id/server_data"
+        android:onClick="@{()-> activity.viewServerData()}"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:padding="15dp"
+        android:elevation="3dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/button_background"
+        android:visibility="visible">
+
+
+        <TextView
+            style="@string/font_circular_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="View Data"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="17sp" />
+
+
+    </RelativeLayout>
+
 </RelativeLayout>
             <TextView
                 android:id="@+id/save"
@@ -387,7 +434,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/_15sdp"
                 android:textStyle="italic"
-                android:visibility="visible"
+                android:visibility="gone"
                 style="@string/font_circular_medium" />
 
         </RelativeLayout>

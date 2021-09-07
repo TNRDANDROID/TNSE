@@ -3,6 +3,7 @@ package com.nic.tnsec.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -74,6 +75,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
 
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 2500;
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
+    final int CROP_PIC = 2;
     private static final int PERMISSION_REQUEST_CODE = 200;
     private static String imageStoragePath;
     public static final int BITMAP_SAMPLE_SIZE = 8;
@@ -85,14 +87,9 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
 
     String pp_id,empcode,empcode_type;
 
-
-    private List<View> viewArrayList = new ArrayList<>();
-
-
     public static DBHelper dbHelper;
     public static SQLiteDatabase db;
-    private com.nic.tnsec.DataBase.dbData dbData = new dbData(this);
-    String pmay_id;
+    private Uri picUri;
 
 
     @Override
@@ -140,7 +137,32 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void getPerMissionCapture(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (CameraUtils.checkPermissions(CameraScreen.this)) {
+                captureImage();
 
+            } else {
+                requestCameraPermission(MEDIA_TYPE_IMAGE);
+            }
+//                            checkPermissionForCamera();
+        } else {
+            captureImage();
+
+        }
+
+    }
+
+/*
+    private void captureImage() {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+        if (MyLocationListener.latitude > 0) {
+            offlatTextValue = MyLocationListener.latitude;
+            offlongTextValue = MyLocationListener.longitude;
+        }
+    }
+*/
     private void captureImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -301,6 +323,79 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
+    private void performCrop() {
+        // take care of exceptions
+        try {
+            // call the standard crop action intent (the user device may not
+            // support it)
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            // indicate image type and Uri
+            cropIntent.setDataAndType(picUri, "image/*");
+            // set crop properties
+            cropIntent.putExtra("crop", "true");
+            // indicate aspect of desired crop
+            cropIntent.putExtra("aspectX", 2);
+            cropIntent.putExtra("aspectY", 1);
+            // indicate output X and Y
+            cropIntent.putExtra("outputX", 256);
+            cropIntent.putExtra("outputY", 256);
+            // retrieve data on return
+            cropIntent.putExtra("return-data", true);
+            // start the activity - we handle returning in onActivityResult
+            startActivityForResult(cropIntent, CROP_PIC);
+        }
+        // respond to users whose devices do not support the crop action
+        catch (ActivityNotFoundException anfe) {
+            Toast toast = Toast
+                    .makeText(this, "This device doesn't support the crop action!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+/*
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // if the result is capturing Image
+        super.onActivityResult(requestCode, resultCode, data);
+            if (resultCode == RESULT_OK) {
+                if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
+                    // get the Uri for the captured image
+                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+
+                    // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+                    picUri = getImageUri(getApplicationContext(), photo);
+//                    picUri = data.getData();
+                    performCrop();
+                }
+                // user is returning from cropping the image
+                else if (requestCode == CROP_PIC) {
+                    // get the returned data
+                    // get the cropped bitmap
+                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+                    cameraScreenBinding.imagePreview.setVisibility(View.GONE);
+                    cameraScreenBinding.imageView.setVisibility(View.VISIBLE);
+                    cameraScreenBinding.imageView.setImageBitmap(photo);
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                // user cancelled Image capture
+                Toast.makeText(getApplicationContext(),
+                        "User cancelled image capture", Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                // failed to capture image
+                Toast.makeText(getApplicationContext(),
+                        "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
+                        .show();
+            }
+
+    }
+*/
+    private Uri getImageUri(Context applicationContext, Bitmap photo)
+    {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(CameraScreen.this.getContentResolver(), photo, "Title", null);
+        return Uri.parse(path);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
@@ -385,13 +480,15 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
             imageInByte = baos.toByteArray();
             image_str = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-
+            String line = empcode;
+            line = line.replace("\\/", "");
+            System.out.println(line);
 
 
             try {
                 dataSet.put(AppConstant.KEY_SERVICE_ID, "save_pp_image");
                 dataSet.put("empcode_type", empcode_type);
-                dataSet.put("empcode", empcode);
+                dataSet.put("empcode", line);
                 dataSet.put("pp_id", pp_id);
                 dataSet.put("pp_image", image_str);
             }
@@ -420,7 +517,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
                 JSONObject jsonObject = new JSONObject(responseDecryptedBlockKey);
                 if (jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("OK")) {
                    // JSONArray jsonArray = new JSONArray();
-                    Utils.showAlert(this,jsonObject.getString("MESSAGE"));
+                    Toast.makeText(this, jsonObject.getString("MESSAGE"), Toast.LENGTH_SHORT).show();
                     final Handler handler = new Handler(Looper.getMainLooper());
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -437,14 +534,14 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
             }
         }
         catch (JSONException e){
-
+                Utils.showAlert(this,"Something Wrong");
         }
 
     }
 
     @Override
     public void OnError(VolleyError volleyError) {
-
+        Utils.showAlert(this,"Something Wrong");
     }
 
     public void homePage() {
@@ -472,71 +569,6 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
         overridePendingTransition(R.anim.fleft, R.anim.fhelper);
         finish();
-    }
-
-    public void saveActivityImage() {
-        dbData.open();
-        String whereClause = "";
-        String[] whereArgs = null;
-
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
-        byte[] imageInByte = new byte[0];
-        String image_str = "";
-        try {
-            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
-            imageInByte = baos.toByteArray();
-            image_str = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-
-            if (getIntent().getStringExtra(AppConstant.KEY_PURPOSE).equalsIgnoreCase("Insert")) {
-                ContentValues values = new ContentValues();
-            /*values.put(AppConstant.DISTRICT_CODE, prefManager.getDistrictCode());
-            values.put(AppConstant.BLOCK_CODE, prefManager.getBlockCode());*/
-
-
-            values.put(AppConstant.KEY_LATITUDE, offlatTextValue.toString());
-            values.put(AppConstant.KEY_LONGITUDE, offlongTextValue.toString());
-            values.put(AppConstant.IMAGE, image_str.trim());
-           // values.put(AppConstant.DESCRIPTION, cameraScreenBinding.des.getText().toString());
-
-
-            long id = db.insert(DBHelper.POLLING_STATION_IMAGE, null, values);
-                if (id > 0) {
-                    Toasty.success(this, "Success!", Toast.LENGTH_LONG, true).show();
-                    super.onBackPressed();
-                    overridePendingTransition(R.anim.slide_enter, R.anim.slide_exit);
-                }
-            } else if (getIntent().getStringExtra(AppConstant.KEY_PURPOSE).equalsIgnoreCase("Update")) {
-
-                String photo_id = getIntent().getStringExtra(AppConstant.KEY_PHOTO_ID);
-
-                ContentValues values = new ContentValues();
-                values.put(AppConstant.KEY_LATITUDE, offlatTextValue.toString());
-                values.put(AppConstant.KEY_LONGITUDE, offlongTextValue.toString());
-                values.put(AppConstant.IMAGE, image_str.trim());
-
-                whereClause = "id = ?";
-                whereArgs = new String[]{photo_id};
-                dbData.open();
-
-                long id = db.update(DBHelper.POLLING_STATION_IMAGE, values, whereClause, whereArgs);
-
-
-                if (id > 0) {
-                    Toasty.success(this, "Updated!", Toast.LENGTH_LONG, true).show();
-                    homePage();
-                }
-                Log.d("PollingStationImageId", String.valueOf(id));
-            }
-
-
-
-
-        } catch (Exception e) {
-            Utils.showAlert(CameraScreen.this, "Atleast Capture one Photo");
-            //e.printStackTrace();
-        }
     }
 
 

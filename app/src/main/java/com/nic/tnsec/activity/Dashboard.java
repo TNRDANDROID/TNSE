@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -52,7 +56,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
     private PrefManager prefManager;
     ArrayList<ElectionProject> employeeTypeLists;
     ArrayList<ElectionProject> employeeSearchList;
-
+    ArrayList<ElectionProject> employeeDetails;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +70,9 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         stb2 = AnimationUtils.loadAnimation(this, R.anim.stb2);
 
         prefManager = new PrefManager(this);
-
+        employeeSearchList=new ArrayList<>();
+        dashboardBinding.empPhotoView.setVisibility(View.GONE);
+        dashboardBinding.details.setVisibility(View.GONE);
         dashboardBinding.districtUserLayout.setTranslationX(800);
         dashboardBinding.blockUserLayout.setTranslationX(800);
 
@@ -95,6 +101,42 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         anim.setRepeatCount(Animation.INFINITE);
         getEmpType();
         dashboardBinding.btnValidate.setOnClickListener(this);
+
+        dashboardBinding.typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                dashboardBinding.details.setVisibility(View.GONE);
+                dashboardBinding.empPhotoView.setVisibility(View.GONE);
+                dashboardBinding.typeValue.setText("");
+                dashboardBinding.validateCheckIcon.setVisibility(View.GONE);
+                employeeSearchList.clear();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        dashboardBinding.typeValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                dashboardBinding.details.setVisibility(View.GONE);
+                dashboardBinding.empPhotoView.setVisibility(View.GONE);
+                dashboardBinding.validateCheckIcon.setVisibility(View.GONE);
+                employeeSearchList.clear();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
 
 
@@ -148,10 +190,13 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         String empcode_type = employeeTypeLists.get(dashboardBinding.typeSpinner.getSelectedItemPosition()).getEmpcode_type();
         String empcode=dashboardBinding.typeValue.getText().toString();
         JSONObject dataSet = new JSONObject();
+        String line = empcode;
+        line = line.replace("\\/", "");
+        System.out.println(line);
         try {
             dataSet.put(AppConstant.KEY_SERVICE_ID, "empcode_search");
             dataSet.put("empcode_type", empcode_type);
-            dataSet.put("empcode", empcode);
+            dataSet.put("empcode", line);
         }
         catch (JSONException e){
 
@@ -195,6 +240,13 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         new MyDialog(this).exitDialog(this, "Are you sure you want to Logout?", "Logout");
     }
 
+    public void openViewDataScreen(JSONArray jsonArray) {
+        Intent intent = new Intent(Dashboard.this, ViewDataScreen.class);
+        intent.putExtra("ServerList", jsonArray.toString());
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+        finish();
+    }
 
 
     public void cameraScreen(){
@@ -202,12 +254,35 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         intent.putExtra(AppConstant.KEY_PURPOSE, "Insert");
         intent.putExtra("empcode_type",employeeTypeLists.get(dashboardBinding.typeSpinner.getSelectedItemPosition()).getEmpcode_type());
         intent.putExtra("empcode",dashboardBinding.typeValue.getText().toString());
+        //intent.putExtra("empcode","338280/EDN");
         intent.putExtra("pp_id",employeeSearchList.get(0).getPp_id());
         startActivity(intent);
         overridePendingTransition(R.anim.fleft, R.anim.fhelper);
         finish();
     }
 
+    public void viewServerData() {
+        if (Utils.isOnline()) {
+            getServerDataList();
+        } else {
+            Utils.showAlert(Dashboard.this, "Your Internet seems to be Offline.Data can be viewed only in Online mode.");
+        }
+    }
+    public void getServerDataList() {
+        try {
+            new ApiService(this).makeJSONObjectRequest("ServerDataList", Api.Method.POST, UrlGenerator.getMainServiceUrl(), ServerDataListJsonParams(), "not cache", this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public JSONObject ServerDataListJsonParams() throws JSONException {
+        String authKey = Utils.encrypt(prefManager.getUserPassKey(), getResources().getString(R.string.init_vector), Utils.serverDataListJsonParams().toString());
+        JSONObject dataSet = new JSONObject();
+        dataSet.put(AppConstant.KEY_USER_NAME, prefManager.getUserName());
+        dataSet.put(AppConstant.DATA_CONTENT, authKey);
+        Log.d("ServerDataList", "" + dataSet);
+        return dataSet;
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -280,6 +355,22 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                 }
                 Log.d("ValidateEmp", "" + responseDecryptedBlockKey);
             }
+        if ("ServerDataList".equals(urlType) && responseObj != null) {
+                String key = responseObj.getString(AppConstant.ENCODE_DATA);
+                String responseDecryptedBlockKey = Utils.decrypt(prefManager.getUserPassKey(), key);
+                Log.d("ServerDataListResponse", "" + responseDecryptedBlockKey);
+                JSONObject jsonObject = new JSONObject(responseDecryptedBlockKey);
+                if (jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("OK")) {
+                    JSONArray jsonArray = new JSONArray();
+                    jsonArray = jsonObject.getJSONArray(AppConstant.JSON_DATA);
+//                    prefManager.setServerDataList(this,jsonArray.toString());
+                    openViewDataScreen(jsonArray);
+                }else if(jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("NO_RECORD") && jsonObject.getString("MESSAGE").equalsIgnoreCase("NO_RECORD")){
+                    Utils.showAlert(this,"No Record Found!");
+                }
+
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

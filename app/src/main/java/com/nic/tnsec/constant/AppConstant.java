@@ -39,5 +39,9 @@ public class AppConstant {
     public static String KEY_PHOTO_ID = "id";
     public static String KEY_EMP_TYPE = "empcode_type";
     public static String KEY_EMP_DESCRIPTION = "empcode_description";
+    public static String KEY_SERVER_DATA = "emp_entry_list";
+    public static String KEY_EMP_PHOTO = "KEY_EMP_PHOTO";
+    public static String KEY_EMP_ID = "pp_id";
+    public static String KEY_IMAGE = "KEY_IMAGE";
 
 }

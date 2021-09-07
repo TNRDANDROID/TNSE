@@ -316,5 +316,11 @@ public class Utils {
         Log.d("empTypeJsonParams", "" + dataSet);
         return dataSet;
     }
+    public static JSONObject serverDataListJsonParams() throws JSONException {
+        JSONObject dataSet = new JSONObject();
+        dataSet.put(AppConstant.KEY_SERVICE_ID, AppConstant.KEY_SERVER_DATA);
+        Log.d("serverListJsonParams", "" + dataSet);
+        return dataSet;
+    }
 
 }

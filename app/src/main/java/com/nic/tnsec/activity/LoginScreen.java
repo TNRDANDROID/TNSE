@@ -150,6 +150,9 @@ public LoginScreenBinding loginScreenBinding;
         loginScreenBinding.username.setText("ppdekpm01");
         loginScreenBinding.password.setText("test123#$");
 
+        /*loginScreenBinding.username.setText("ppdevpm01");
+        loginScreenBinding.password.setText("test123#$");*/
+
         final String username = loginScreenBinding.username.getText().toString().trim();
         final String password = loginScreenBinding.password.getText().toString().trim();
         prefManager.setUserPassword(password);
