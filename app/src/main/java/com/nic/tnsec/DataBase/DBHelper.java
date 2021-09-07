@@ -62,6 +62,8 @@ public class DBHelper extends SQLiteOpenHelper {
         if (oldVersion >= newVersion) {
             //drop table if already exists
             db.execSQL("DROP TABLE IF EXISTS " + RO_USER_TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + POLLING_STATION_IMAGE);
+            db.execSQL("DROP TABLE IF EXISTS " + SAVE_EMP_DETAILS);
             onCreate(db);
         }
     }

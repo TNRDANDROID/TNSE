@@ -323,6 +323,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
+
     private void performCrop() {
         // take care of exceptions
         try {

@@ -23,6 +23,8 @@ import com.nic.tnsec.api.Api;
 import com.nic.tnsec.api.ServerResponse;
 import com.nic.tnsec.databinding.ViewDataScreenBinding;
 import com.nic.tnsec.pojo.ElectionProject;
+import com.nic.tnsec.support.ProgressHUD;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +42,7 @@ public class ViewDataScreen extends AppCompatActivity implements Api.ServerRespo
     public dbData dbData = new dbData(this);
     public static DBHelper dbHelper;
     public static SQLiteDatabase db;
+    private ProgressHUD progressHUD;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,11 +78,18 @@ public class ViewDataScreen extends AppCompatActivity implements Api.ServerRespo
             Log.d("savedList_COUNT", String.valueOf(savedAllList.size()));
             return savedAllList;
         }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressHUD = ProgressHUD.show(ViewDataScreen.this, "Loading", true, false, null);
+        }
 
         @Override
         protected void onPostExecute(ArrayList<ElectionProject> savedList) {
             super.onPostExecute(savedList);
-
+            if(progressHUD!=null){
+                progressHUD.cancel();
+            }
             viewDataAdapter = new ViewDataAdapter(ViewDataScreen.this, savedList);
             if (savedList.size() > 0) {
                 recyclerView.setVisibility(View.VISIBLE);

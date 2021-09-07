@@ -422,9 +422,10 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         protected Void doInBackground(JSONObject... params) {
 
             dbData.open();
-            dbData.deleteServerDataTable();
+
             ArrayList<ElectionProject> all_kvvtListCount = dbData.getAll_dataList();
             if (all_kvvtListCount.size() <= 0) {
+
                 if (params.length > 0) {
                     JSONArray jsonArray = new JSONArray();
                     try {

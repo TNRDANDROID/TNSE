@@ -142,7 +142,6 @@ public class dbData {
         }
         return cards;
     }
-    public void deleteServerDataTable() { db.execSQL("delete from " + DBHelper.SAVE_EMP_DETAILS); }
 
     public void deleteAllTables(){
         deletePollingStationImages();
@@ -152,6 +151,9 @@ public class dbData {
 
     public void deletePollingStationImages() {
         db.execSQL("delete from " + DBHelper.POLLING_STATION_IMAGE);
+    }
+    public void deleteServerDataTable() {
+        db.execSQL("delete from " + DBHelper.SAVE_EMP_DETAILS);
     }
 
 }
