@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -44,6 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +59,10 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
     ArrayList<ElectionProject> employeeTypeLists;
     ArrayList<ElectionProject> employeeSearchList;
     ArrayList<ElectionProject> employeeDetails;
+    public dbData dbData = new dbData(this);
+    public static DBHelper dbHelper;
+    public static SQLiteDatabase db;
+    private ProgressHUD progressHUD;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +71,12 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         dashboardBinding.setActivity(this);
         /*WindowPreferencesManager windowPreferencesManager = new WindowPreferencesManager(this);
         windowPreferencesManager.applyEdgeToEdgePreference(getWindow());*/
+        try {
+            dbHelper = new DBHelper(this);
+            db = dbHelper.getWritableDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         smalltobig = AnimationUtils.loadAnimation(this, R.anim.smalltobig);
         stb2 = AnimationUtils.loadAnimation(this, R.anim.stb2);
@@ -240,13 +252,45 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         new MyDialog(this).exitDialog(this, "Are you sure you want to Logout?", "Logout");
     }
 
-    public void openViewDataScreen(JSONArray jsonArray) {
-        Intent intent = new Intent(Dashboard.this, ViewDataScreen.class);
-        intent.putExtra("ServerList", jsonArray.toString());
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-        finish();
+/*
+    public void openViewDataScreen(JSONObject jsonObject) {
+        JSONArray jsonArray = new JSONArray();
+        ArrayList<ElectionProject> employeeDetails=new ArrayList<>();
+        try {
+            jsonArray = jsonObject.getJSONArray(AppConstant.JSON_DATA);
+            if (jsonArray != null && jsonArray.length() > 0) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    ElectionProject empDetails = new ElectionProject();
+                    try {
+                        empDetails.setPp_id(jsonArray.getJSONObject(i).getString("pp_id"));
+                        empDetails.setEmpcode_type(jsonArray.getJSONObject(i).getString("empcode_type"));
+                        empDetails.setEmpcode_description(jsonArray.getJSONObject(i).getString("empcode"));
+                        empDetails.setName_of_staff(jsonArray.getJSONObject(i).getString("name_of_staff"));
+                        empDetails.setDept_org_name(jsonArray.getJSONObject(i).getString("dept_org_name"));
+                        empDetails.setGender(jsonArray.getJSONObject(i).getString("gender"));
+                        empDetails.setPhoto_available(jsonArray.getJSONObject(i).getString("photo_available"));
+                        employeeDetails.add(empDetails);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                Intent intent = new Intent(Dashboard.this, ViewDataScreen.class);
+                intent.putExtra("ServerList", ((Serializable)employeeDetails));
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                finish();
+
+
+            }
+
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+*/
 
 
     public void cameraScreen(){
@@ -361,10 +405,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                 Log.d("ServerDataListResponse", "" + responseDecryptedBlockKey);
                 JSONObject jsonObject = new JSONObject(responseDecryptedBlockKey);
                 if (jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("OK")) {
-                    JSONArray jsonArray = new JSONArray();
-                    jsonArray = jsonObject.getJSONArray(AppConstant.JSON_DATA);
-//                    prefManager.setServerDataList(this,jsonArray.toString());
-                    openViewDataScreen(jsonArray);
+                    new InsertDataTask().execute(jsonObject);
                 }else if(jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("NO_RECORD") && jsonObject.getString("MESSAGE").equalsIgnoreCase("NO_RECORD")){
                     Utils.showAlert(this,"No Record Found!");
                 }
@@ -373,6 +414,61 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+    public class InsertDataTask extends AsyncTask<JSONObject, Void, Void> {
+
+        @Override
+        protected Void doInBackground(JSONObject... params) {
+
+            dbData.open();
+            dbData.deleteServerDataTable();
+            ArrayList<ElectionProject> all_kvvtListCount = dbData.getAll_dataList();
+            if (all_kvvtListCount.size() <= 0) {
+                if (params.length > 0) {
+                    JSONArray jsonArray = new JSONArray();
+                    try {
+                        jsonArray = params[0].getJSONArray(AppConstant.JSON_DATA);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        ElectionProject empDetails = new ElectionProject();
+                        try {
+                            empDetails.setPp_id(jsonArray.getJSONObject(i).getString("pp_id"));
+                            empDetails.setEmpcode_type(jsonArray.getJSONObject(i).getString("empcode_type"));
+                            empDetails.setEmpcode_description(jsonArray.getJSONObject(i).getString("empcode"));
+                            empDetails.setName_of_staff(jsonArray.getJSONObject(i).getString("name_of_staff"));
+                            empDetails.setDept_org_name(jsonArray.getJSONObject(i).getString("dept_org_name"));
+                            empDetails.setGender(jsonArray.getJSONObject(i).getString("gender"));
+                            empDetails.setPhoto_available(jsonArray.getJSONObject(i).getString("photo_available"));
+                            dbData.insertData(empDetails);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+            }
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressHUD = ProgressHUD.show(Dashboard.this, "Downloading", true, false, null);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(progressHUD!=null){
+                progressHUD.cancel();
+            }
+            Intent intent = new Intent(Dashboard.this, ViewDataScreen.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+
         }
     }
 

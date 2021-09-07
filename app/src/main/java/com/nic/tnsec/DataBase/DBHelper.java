@@ -12,6 +12,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static final String RO_USER_TABLE_NAME = "RO_UserTable";
     public static final String POLLING_STATION_IMAGE = "Polling_Station_Image";
+    public static final String SAVE_EMP_DETAILS = "SaveEmpDetails";
     private Context context;
 
     public DBHelper(Context context) {
@@ -43,6 +44,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 "lat TEXT," +
                 "long TEXT," +
                 "image_description TEXT)");
+        db.execSQL("CREATE TABLE " + SAVE_EMP_DETAILS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "pp_id TEXT," +
+                "empcode_type TEXT," +
+                "empcode TEXT," +
+                "name_of_staff TEXT," +
+                "dept_org_name TEXT," +
+                "gender TEXT," +
+                "photo_available TEXT)");
 
 
     }

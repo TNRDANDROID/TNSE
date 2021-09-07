@@ -2,11 +2,13 @@ package com.nic.tnsec.pojo;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
+
 /**
  * Created by AchanthiSundar on 01-11-2017.
  */
 
-public class ElectionProject {
+public class ElectionProject  {
 
     private String distictCode;
     private String districtName;

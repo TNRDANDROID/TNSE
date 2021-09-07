@@ -57,7 +57,7 @@ public class ViewDataAdapter extends RecyclerView.Adapter<ViewDataAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        holder.viewDataAdapterBinding.name.setText(viewDataListValues.get(position).getStaffName());
+        holder.viewDataAdapterBinding.name.setText(viewDataListValues.get(position).getName_of_staff());
         holder.viewDataAdapterBinding.organisation.setText(viewDataListValues.get(position).getDept_org_name());
 
         holder.viewDataAdapterBinding.viewImage.setOnClickListener(new View.OnClickListener() {

@@ -2,7 +2,10 @@ package com.nic.tnsec.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +14,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.VolleyError;
+import com.nic.tnsec.DataBase.DBHelper;
+import com.nic.tnsec.DataBase.dbData;
 import com.nic.tnsec.R;
 import com.nic.tnsec.Session.PrefManager;
 import com.nic.tnsec.adapter.ViewDataAdapter;
@@ -20,6 +25,8 @@ import com.nic.tnsec.databinding.ViewDataScreenBinding;
 import com.nic.tnsec.pojo.ElectionProject;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class ViewDataScreen extends AppCompatActivity implements Api.ServerResponseListener {
@@ -29,29 +36,82 @@ public class ViewDataScreen extends AppCompatActivity implements Api.ServerRespo
     private PrefManager prefManager;
     private Activity context;
     ArrayList<ElectionProject> employeeDetails;
+    ArrayList<ElectionProject> savedList = new ArrayList<>();
+    public dbData dbData = new dbData(this);
+    public static DBHelper dbHelper;
+    public static SQLiteDatabase db;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewDataBinding = DataBindingUtil.setContentView(this, R.layout.view_data_screen);
         viewDataBinding.setActivity(this);
         context = this;
+        try {
+            dbHelper = new DBHelper(this);
+            db = dbHelper.getWritableDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         prefManager = new PrefManager(this);
         recyclerView = viewDataBinding.serverDataList;
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setNestedScrollingEnabled(false);
-        LoadServerData();
+        viewDataAdapter = new ViewDataAdapter(ViewDataScreen.this, savedList);
+        recyclerView.setAdapter(viewDataAdapter);
+        new fetchScheduletask().execute();
+//        LoadServerData();
+
+    }
+    public class fetchScheduletask extends AsyncTask<Void, Void,
+            ArrayList<ElectionProject>> {
+        @Override
+        protected ArrayList<ElectionProject> doInBackground(Void... params) {
+            dbData.open();
+            ArrayList<ElectionProject> savedAllList = new ArrayList<>();
+            savedAllList = dbData.getAll_dataList();
+            Log.d("savedList_COUNT", String.valueOf(savedAllList.size()));
+            return savedAllList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<ElectionProject> savedList) {
+            super.onPostExecute(savedList);
+
+            viewDataAdapter = new ViewDataAdapter(ViewDataScreen.this, savedList);
+            if (savedList.size() > 0) {
+                recyclerView.setVisibility(View.VISIBLE);
+                viewDataBinding.notFoundTv.setVisibility(View.GONE);
+                recyclerView.setAdapter(viewDataAdapter);
+            } else {
+                recyclerView.setVisibility(View.GONE);
+                viewDataBinding.notFoundTv.setVisibility(View.VISIBLE);
+            }
+        }
+
 
     }
 
+/*
     private void LoadServerData() {
-        employeeDetails=new ArrayList<>();
-        String array = getIntent().getStringExtra("ServerList");
+        try{
 
-        try {
-            JSONArray jsonArray = new JSONArray(array);
+            employeeDetails=new ArrayList<>();
+            //String array = getIntent().getStringExtra("ServerList");
+            employeeDetails = (ArrayList<ElectionProject>) getIntent().getSerializableExtra("ServerList");
+        }
+        catch (Exception e){
+
+        }
+
+
+
+       */
+/* try {
+            JSONObject json = new JSONObject(array);
+            JSONArray jsonArray = new JSONArray(json);
             if(jsonArray != null && jsonArray.length() >0) {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     ElectionProject empDetails = new ElectionProject();
@@ -75,7 +135,8 @@ public class ViewDataScreen extends AppCompatActivity implements Api.ServerRespo
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*//*
+
 
         if(employeeDetails != null && employeeDetails.size() >0) {
             viewDataBinding.notFoundTv.setVisibility(View.GONE);
@@ -87,6 +148,7 @@ public class ViewDataScreen extends AppCompatActivity implements Api.ServerRespo
             recyclerView.setVisibility(View.GONE);
         }
 
+*/
 /*
         try {
             JSONArray jsonArray=new JSONArray(prefManager.getServerDataList(context));
@@ -123,8 +185,10 @@ public class ViewDataScreen extends AppCompatActivity implements Api.ServerRespo
         } catch (JSONException e) {
             e.printStackTrace();
         }
-*/
+*//*
+
     }
+*/
 
 
     @Override
