@@ -19,8 +19,18 @@ public class ElectionProject  {
     String empcode_description;
     String emp_image;
     String emp_designation_name;
+    String emp_ddo_code;
 
     String pp_id,name_of_staff,dept_org_name,gender,photo_available;
+
+    public String getEmp_ddo_code() {
+        return emp_ddo_code;
+    }
+
+    public ElectionProject setEmp_ddo_code(String emp_ddo_code) {
+        this.emp_ddo_code = emp_ddo_code;
+        return this;
+    }
 
     public String getEmp_designation_name() {
         return emp_designation_name;

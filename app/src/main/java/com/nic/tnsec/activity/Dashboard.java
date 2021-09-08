@@ -374,6 +374,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                             empSearchDetails.setGender(jsonArray.getJSONObject(i).getString("gender"));
                             empSearchDetails.setPhoto_available(jsonArray.getJSONObject(i).getString("photo_available"));
                             empSearchDetails.setEmp_designation_name(jsonArray.getJSONObject(i).getString("designation_name"));
+                            empSearchDetails.setEmp_ddo_code(jsonArray.getJSONObject(i).getString("ddo_code"));
                             //empSearchDetails.setEmp_image(jsonArray.getJSONObject(i).getString("pp_image"));
                             employeeSearchList.add(empSearchDetails);
                             hideKeyboard(this);
@@ -390,6 +391,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                     dashboardBinding.empName.setText(employeeSearchList.get(0).getName_of_staff());
                     dashboardBinding.empOrganaisation.setText(employeeSearchList.get(0).getDept_org_name());
                     dashboardBinding.empDesignation.setText(employeeSearchList.get(0).getEmp_designation_name());
+                    dashboardBinding.empDdoCode.setText(employeeSearchList.get(0).getEmp_ddo_code());
                     if(employeeSearchList.get(0).getPhoto_available().toString().equalsIgnoreCase("Y")){
                         byte[] decodedString = Base64.decode(pp_image, Base64.DEFAULT);
                         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -407,6 +409,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                     dashboardBinding.empPhotoSave.setVisibility(View.GONE);
                 }
                 Log.d("ValidateEmp", "" + responseDecryptedBlockKey);
+                Log.d("responseObj", "" + responseObj.toString());
             }
         if ("ServerDataList".equals(urlType) && responseObj != null) {
                 String key = responseObj.getString(AppConstant.ENCODE_DATA);

@@ -216,9 +216,9 @@
                     android:text="Validate"
                     android:paddingLeft="@dimen/margin_left_20dp"
                     android:paddingRight="@dimen/margin_left_20dp"
-                    android:textSize="@dimen/_14sdp"
+                    android:textSize="@dimen/_15sdp"
                     android:layout_margin="@dimen/_15sdp"
-                    android:textAllCaps="true"
+                    android:textAllCaps="false"
                     android:textColor="@android:color/white" />
 
                 <ImageView
@@ -332,7 +332,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:layout_marginBottom="@dimen/padding"
                     android:gravity="center_vertical"
                     android:layout_gravity="center_vertical"
                     android:orientation="horizontal"
@@ -366,6 +365,45 @@
 
 
                 </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/block_user_layout4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginBottom="@dimen/padding"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/_5sdp">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingLeft="5dp"
+                        android:gravity="center_vertical"
+                        android:paddingRight="5dp"
+                        android:text="DDO Code       : "
+                        android:textColor="@color/grey_9"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/emp_ddo_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:text="Kanchipuram"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+
+                </LinearLayout>
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_150sdp"
@@ -385,11 +423,11 @@
                 android:onClick="@{()-> activity.saveEmployeePhoto()}"
                 android:background="@drawable/button_background"
                 android:text="Upload Image"
-                android:textSize="@dimen/_14sdp"
+                android:textSize="@dimen/_15sdp"
                 android:paddingLeft="@dimen/margin_left_20dp"
                 android:paddingRight="@dimen/margin_left_20dp"
                 android:layout_margin="@dimen/_15sdp"
-                android:textAllCaps="true"
+                android:textAllCaps="false"
                 android:textColor="@android:color/white" />
 
 <!--
