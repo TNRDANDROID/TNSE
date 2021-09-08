@@ -101,13 +101,13 @@ splashScreenBinding.ivlogo.setVisibility(View.VISIBLE);
 
     @Override
     public void onAppVersionCallback(String value) {
-       /* if (value.length() > 0 && "Update".equalsIgnoreCase(value)) {
+        if (value.length() > 0 && "Update".equalsIgnoreCase(value)) {
             startActivity(new Intent(this, AppUpdateDialog.class));
             finish();
             overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         } else {
             showSignInScreen();
-        }*/
+        }
 
     }
 

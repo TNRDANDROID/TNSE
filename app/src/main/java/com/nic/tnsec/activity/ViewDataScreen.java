@@ -24,11 +24,6 @@ import com.nic.tnsec.api.ServerResponse;
 import com.nic.tnsec.databinding.ViewDataScreenBinding;
 import com.nic.tnsec.pojo.ElectionProject;
 import com.nic.tnsec.support.ProgressHUD;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class ViewDataScreen extends AppCompatActivity implements Api.ServerResponseListener {

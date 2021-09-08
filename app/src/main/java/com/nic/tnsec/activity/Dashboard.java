@@ -1,15 +1,25 @@
 package com.nic.tnsec.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -22,11 +32,18 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import com.android.volley.VolleyError;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.nic.tnsec.DataBase.DBHelper;
 import com.nic.tnsec.DataBase.dbData;
 import com.nic.tnsec.R;
@@ -40,17 +57,25 @@ import com.nic.tnsec.databinding.DashboardBinding;
 import com.nic.tnsec.dialog.MyDialog;
 import com.nic.tnsec.pojo.ElectionProject;
 import com.nic.tnsec.pojo.EmployeeTypeList;
+import com.nic.tnsec.support.MyLocationListener;
 import com.nic.tnsec.support.ProgressHUD;
+import com.nic.tnsec.utils.CameraUtils;
 import com.nic.tnsec.utils.UrlGenerator;
 import com.nic.tnsec.utils.Utils;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.os.Build.VERSION_CODES.M;
 
 public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickListener, Api.ServerResponseListener, View.OnClickListener {
 
@@ -61,11 +86,16 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
     private PrefManager prefManager;
     ArrayList<ElectionProject> employeeTypeLists;
     ArrayList<ElectionProject> employeeSearchList;
-    ArrayList<ElectionProject> employeeDetails;
     public dbData dbData = new dbData(this);
     public static DBHelper dbHelper;
     public static SQLiteDatabase db;
     private ProgressHUD progressHUD;
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 2500;
+    private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
+    private static String imageStoragePath;
+    public static final int BITMAP_SAMPLE_SIZE = 8;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,11 +117,10 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         prefManager = new PrefManager(this);
         employeeSearchList=new ArrayList<>();
         dashboardBinding.empPhotoView.setVisibility(View.GONE);
+        dashboardBinding.empPhotoSave.setVisibility(View.GONE);
         dashboardBinding.details.setVisibility(View.GONE);
         dashboardBinding.districtUserLayout.setTranslationX(800);
         dashboardBinding.blockUserLayout.setTranslationX(800);
-
-
 
         dashboardBinding.districtUserLayout.setAlpha(0);
         dashboardBinding.blockUserLayout.setAlpha(0);
@@ -122,6 +151,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 dashboardBinding.details.setVisibility(View.GONE);
                 dashboardBinding.empPhotoView.setVisibility(View.GONE);
+                dashboardBinding.empPhotoSave.setVisibility(View.GONE);
                 dashboardBinding.typeValue.setText("");
                 dashboardBinding.validateCheckIcon.setVisibility(View.GONE);
                 employeeSearchList.clear();
@@ -143,6 +173,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 dashboardBinding.details.setVisibility(View.GONE);
                 dashboardBinding.empPhotoView.setVisibility(View.GONE);
+                dashboardBinding.empPhotoSave.setVisibility(View.GONE);
                 dashboardBinding.validateCheckIcon.setVisibility(View.GONE);
                 employeeSearchList.clear();
             }
@@ -255,45 +286,6 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         new MyDialog(this).exitDialog(this, "Are you sure you want to Logout?", "Logout");
     }
 
-/*
-    public void openViewDataScreen(JSONObject jsonObject) {
-        JSONArray jsonArray = new JSONArray();
-        ArrayList<ElectionProject> employeeDetails=new ArrayList<>();
-        try {
-            jsonArray = jsonObject.getJSONArray(AppConstant.JSON_DATA);
-            if (jsonArray != null && jsonArray.length() > 0) {
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    ElectionProject empDetails = new ElectionProject();
-                    try {
-                        empDetails.setPp_id(jsonArray.getJSONObject(i).getString("pp_id"));
-                        empDetails.setEmpcode_type(jsonArray.getJSONObject(i).getString("empcode_type"));
-                        empDetails.setEmpcode_description(jsonArray.getJSONObject(i).getString("empcode"));
-                        empDetails.setName_of_staff(jsonArray.getJSONObject(i).getString("name_of_staff"));
-                        empDetails.setDept_org_name(jsonArray.getJSONObject(i).getString("dept_org_name"));
-                        empDetails.setGender(jsonArray.getJSONObject(i).getString("gender"));
-                        empDetails.setPhoto_available(jsonArray.getJSONObject(i).getString("photo_available"));
-                        employeeDetails.add(empDetails);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                Intent intent = new Intent(Dashboard.this, ViewDataScreen.class);
-                intent.putExtra("ServerList", ((Serializable)employeeDetails));
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-                finish();
-
-
-            }
-
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-*/
 
 
     public void cameraScreen(){
@@ -392,6 +384,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                     dashboardBinding.validateCheckIcon.setVisibility(View.VISIBLE);
                     dashboardBinding.validateCheckIcon.setImageResource(R.drawable.check);
                     dashboardBinding.empPhotoView.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhotoSave.setVisibility(View.GONE);
                     dashboardBinding.details.setVisibility(View.VISIBLE);
                     dashboardBinding.empName.setText(employeeSearchList.get(0).getName_of_staff());
                     dashboardBinding.empOrganaisation.setText(employeeSearchList.get(0).getDept_org_name());
@@ -409,6 +402,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                     dashboardBinding.validateCheckIcon.setVisibility(View.VISIBLE);
                     dashboardBinding.validateCheckIcon.setImageResource(R.drawable.wrong_icon);
                     dashboardBinding.empPhotoView.setVisibility(View.GONE);
+                    dashboardBinding.empPhotoSave.setVisibility(View.GONE);
                 }
                 Log.d("ValidateEmp", "" + responseDecryptedBlockKey);
             }
@@ -423,6 +417,16 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                     Utils.showAlert(this,"No Record Found!");
                 }
 
+            }
+        if ("SaveEmpImage".equals(urlType) && responseObj != null) {
+                String key = responseObj.getString(AppConstant.ENCODE_DATA);
+                String responseDecryptedBlockKey = Utils.decrypt(prefManager.getUserPassKey(), key);
+                JSONObject jsonObject = new JSONObject(responseDecryptedBlockKey);
+                if (jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("OK")) {
+                    Toast.makeText(this, jsonObject.getString("MESSAGE"), Toast.LENGTH_SHORT).show();
+                    dashboardBinding.empPhotoSave.setVisibility(View.GONE);
+                }
+                Log.d("SaveEmpImage", "" + responseDecryptedBlockKey);
             }
 
         } catch (JSONException e) {
@@ -557,5 +561,268 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+    public void getPerMissionCapture(){
+        if (Build.VERSION.SDK_INT >= M) {
+            if (CameraUtils.checkPermissions(Dashboard.this)) {
+                captureImage();
+
+            } else {
+                requestCameraPermission(MEDIA_TYPE_IMAGE);
+            }
+//                            checkPermissionForCamera();
+        } else {
+            captureImage();
+
+        }
+
+    }
+    private void captureImage() {
+        if (Build.VERSION.SDK_INT >= M) {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+        }else {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            File file = CameraUtils.getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if (file != null) {
+                imageStoragePath = file.getAbsolutePath();
+            }
+
+            Uri fileUri = CameraUtils.getOutputMediaFileUri(this, file);
+
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+            // start the image capture Intent
+            startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+        }
+    }
+    private void requestCameraPermission(final int type) {
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+
+                            if (type == MEDIA_TYPE_IMAGE) {
+                                // capture picture
+                                captureImage();
+                            } else {
+//                                captureVideo();
+                            }
+
+                        } else if (report.isAnyPermissionPermanentlyDenied()) {
+                            showPermissionsAlert();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+    }
+    private void showPermissionsAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Permissions required!")
+                .setMessage("Camera needs few permissions to work properly. Grant them in settings.")
+                .setPositiveButton("GOTO SETTINGS", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        CameraUtils.openSettings(Dashboard.this);
+                    }
+                })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // if the result is capturing Image
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                if (Build.VERSION.SDK_INT >= M) {
+                    Bitmap photo=(Bitmap) data.getExtras().get("data");
+                    Uri tempUri = getImageUri(getApplicationContext(), photo);
+                    // CALL THIS METHOD TO GET THE ACTUAL PATH
+                    performCrop(tempUri);
+                }
+                else {
+                    // Refreshing the gallery
+                    CameraUtils.refreshGallery(getApplicationContext(), imageStoragePath);
+                    // successfully captured the image
+                    // display it in image view
+                    previewCapturedImage();}
+            } else if (resultCode == RESULT_CANCELED) {
+                // user cancelled Image capture
+                Toast.makeText(getApplicationContext(),
+                        "User cancelled image capture", Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                // failed to capture image
+                Toast.makeText(getApplicationContext(),
+                        "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+
+
+        else if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // Refreshing the gallery
+                CameraUtils.refreshGallery(getApplicationContext(), imageStoragePath);
+
+                // video successfully recorded
+                // preview the recorded video
+//                previewVideo();
+            } else if (resultCode == RESULT_CANCELED) {
+                // user cancelled recording
+                Toast.makeText(getApplicationContext(),
+                        "User cancelled video recording", Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                // failed to record video
+                Toast.makeText(getApplicationContext(),
+                        "Sorry! Failed to record video", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+        else  if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                    dashboardBinding.empPhoto.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhotoSave.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhoto.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+    }
+    private Uri getImageUri(Context applicationContext, Bitmap photo)
+    {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(Dashboard.this.getContentResolver(), photo, "Title", null);
+        return Uri.parse(path);
+    }
+    private void performCrop(Uri tempUri) {
+        // take care of exceptions
+        try{
+            CropImage.activity(tempUri).setAllowRotation(false).setAllowFlipping(false)
+                    .start(this);
+        }
+        catch (Exception e){
+
+        }
+    }
+    public void previewCapturedImage() {
+        try {
+            // hide video preview
+            Bitmap bitmap = CameraUtils.optimizeBitmap(BITMAP_SAMPLE_SIZE, imageStoragePath);
+            dashboardBinding.empPhoto.setVisibility(View.VISIBLE);
+            ExifInterface ei = null;
+            try {
+                ei = new ExifInterface(imageStoragePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED);
+
+            Bitmap rotatedBitmap = null;
+            switch(orientation) {
+
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotatedBitmap = rotateImage(bitmap, 90);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotatedBitmap = rotateImage(bitmap, 180);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotatedBitmap = rotateImage(bitmap, 270);
+                    break;
+
+                case ExifInterface.ORIENTATION_NORMAL:
+                default:
+                    rotatedBitmap = bitmap;
+            }
+            dashboardBinding.empPhoto.setImageBitmap(rotatedBitmap);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
+    }
+    public void saveEmployeePhoto() {
+
+        if(Utils.isOnline()) {
+            try {
+                new ApiService(this).makeJSONObjectRequest("SaveEmpImage", Api.Method.POST, UrlGenerator.getMainServiceUrl(), saveEmpDetailsEncryptJsonParams(), "not cache", this);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            Utils.showAlert(this,"No Internet Connection");
+        }
+    }
+    public JSONObject saveEmpDetailsEncryptJsonParams() throws JSONException {
+        String authKey = Utils.encrypt(prefManager.getUserPassKey(), getResources().getString(R.string.init_vector), saveEmpDetailsNormalJsonParams().toString());
+        JSONObject dataSet = new JSONObject();
+        dataSet.put(AppConstant.KEY_USER_NAME, prefManager.getUserName());
+        dataSet.put(AppConstant.DATA_CONTENT, authKey);
+        Log.d("empTypeListJsonParams", "" + dataSet);
+        return dataSet;
+    }
+
+    public JSONObject saveEmpDetailsNormalJsonParams(){
+        JSONObject dataSet = new JSONObject();
+        ImageView imageView = (ImageView) findViewById(R.id.empPhoto);
+        String image_str = "";
+        byte[] imageInByte = new byte[0];
+        try {
+            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+            imageInByte = baos.toByteArray();
+            image_str = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+            String line = dashboardBinding.typeValue.getText().toString();
+            line = line.replace("\\/", "");
+            System.out.println(line);
+
+
+            try {
+                dataSet.put(AppConstant.KEY_SERVICE_ID, "save_pp_image");
+                dataSet.put("empcode_type", employeeTypeLists.get(dashboardBinding.typeSpinner.getSelectedItemPosition()).getEmpcode_type());
+                dataSet.put("empcode", line);
+                dataSet.put("pp_id", employeeSearchList.get(0).getPp_id());
+                dataSet.put("pp_image", image_str);
+            }
+            catch (JSONException e){
+
+            }
+        } catch (Exception e) {
+            Utils.showAlert(Dashboard.this, "Atleast Capture one Photo");
+            //e.printStackTrace();
+        }
+
+
+        Log.d("empphotoJson", "" + dataSet);
+        return dataSet;
+    }
 }
-//7034432/EDN

@@ -74,7 +74,6 @@ import static android.os.Build.VERSION_CODES.M;
 public class CameraScreen extends AppCompatActivity implements View.OnClickListener, Api.ServerResponseListener {
 
     public static final int MEDIA_TYPE_IMAGE = 1;
-
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 2500;
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
     final int CROP_PIC = 2;
@@ -91,7 +90,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
 
     public static DBHelper dbHelper;
     public static SQLiteDatabase db;
-    private Uri picUri;
+
 
 
     @Override
