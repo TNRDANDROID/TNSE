@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -359,6 +362,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         if ("ValidateEmp".equals(urlType) && responseObj != null) {
                 String key = responseObj.getString(AppConstant.ENCODE_DATA);
                 String pp_id,name_of_staff,dept_org_name,gender,photo_available;
+                String pp_image=responseObj.getString("pp_image");
                 String responseDecryptedBlockKey = Utils.decrypt(prefManager.getUserPassKey(), key);
                 JSONObject jsonObject = new JSONObject(responseDecryptedBlockKey);
                 if (jsonObject.getString("STATUS").equalsIgnoreCase("OK") && jsonObject.getString("RESPONSE").equalsIgnoreCase("OK")) {
@@ -377,6 +381,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                             empSearchDetails.setDept_org_name(jsonArray.getJSONObject(i).getString("dept_org_name"));
                             empSearchDetails.setGender(jsonArray.getJSONObject(i).getString("gender"));
                             empSearchDetails.setPhoto_available(jsonArray.getJSONObject(i).getString("photo_available"));
+                            //empSearchDetails.setEmp_image(jsonArray.getJSONObject(i).getString("pp_image"));
                             employeeSearchList.add(empSearchDetails);
                             hideKeyboard(this);
 
@@ -390,6 +395,14 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                     dashboardBinding.details.setVisibility(View.VISIBLE);
                     dashboardBinding.empName.setText(employeeSearchList.get(0).getName_of_staff());
                     dashboardBinding.empOrganaisation.setText(employeeSearchList.get(0).getDept_org_name());
+                    if(employeeSearchList.get(0).getPhoto_available().toString().equalsIgnoreCase("Y")){
+                        byte[] decodedString = Base64.decode(pp_image, Base64.DEFAULT);
+                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        dashboardBinding.empPhoto.setImageBitmap(decodedByte);
+                        dashboardBinding.empPhoto.setVisibility(View.VISIBLE);
+                    }else {
+                        dashboardBinding.empPhoto.setVisibility(View.GONE);
+                    }
                 }
                 else {
                     dashboardBinding.details.setVisibility(View.GONE);

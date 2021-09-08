@@ -53,6 +53,7 @@ import com.nic.tnsec.support.MyLocationListener;
 import com.nic.tnsec.utils.CameraUtils;
 import com.nic.tnsec.utils.UrlGenerator;
 import com.nic.tnsec.utils.Utils;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +69,7 @@ import es.dmoral.toasty.Toasty;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
+import static android.os.Build.VERSION_CODES.M;
 
 public class CameraScreen extends AppCompatActivity implements View.OnClickListener, Api.ServerResponseListener {
 
@@ -118,15 +120,14 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
 
         mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mlocListener = new MyLocationListener();
-
-        cameraScreenBinding.empPhotoView.setTranslationX(800);
+       /* cameraScreenBinding.empPhotoView.setTranslationX(800);
         cameraScreenBinding.btnSave.setTranslationX(800);
 
         cameraScreenBinding.empPhotoView.setAlpha(0);
         cameraScreenBinding.btnSave.setAlpha(0);
 
         cameraScreenBinding.empPhotoView.animate().translationX(0).alpha(1).setDuration(1200).setStartDelay(700).start();
-        cameraScreenBinding.btnSave.animate().translationX(0).alpha(1).setDuration(1400).setStartDelay(900).start();
+        cameraScreenBinding.btnSave.animate().translationX(0).alpha(1).setDuration(1400).setStartDelay(900).start();*/
 
     }
 
@@ -138,7 +139,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
     }
 
     public void getPerMissionCapture(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= M) {
             if (CameraUtils.checkPermissions(CameraScreen.this)) {
                 captureImage();
 
@@ -164,7 +165,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
     }
 */
     private void captureImage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= M) {
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
         }else {
@@ -205,7 +206,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
         }
 
         if (mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= M) {
                 if (ActivityCompat.checkSelfPermission(CameraScreen.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(CameraScreen.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     requestPermissions(new String[]{CAMERA, ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
             } else {
@@ -215,7 +216,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
                 }
             }
             if (MyLocationListener.latitude > 0) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Build.VERSION.SDK_INT >= M) {
                     if (CameraUtils.checkPermissions(CameraScreen.this)) {
                         captureImage();
                     } else {
@@ -324,9 +325,9 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
                 matrix, true);
     }
 
-    private void performCrop() {
+    private void performCrop(Uri tempUri) {
         // take care of exceptions
-        try {
+       /* try {
             // call the standard crop action intent (the user device may not
             // support it)
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
@@ -350,9 +351,17 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
             Toast toast = Toast
                     .makeText(this, "This device doesn't support the crop action!", Toast.LENGTH_SHORT);
             toast.show();
+        }*/
+        try{
+            CropImage.activity(tempUri).setAllowRotation(false).setAllowFlipping(false)
+                    .start(this);
+        }
+        catch (Exception e){
+
         }
     }
-/*
+
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
@@ -403,18 +412,23 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+                if (Build.VERSION.SDK_INT >= M) {
+                    /*Bitmap photo = (Bitmap) data.getExtras().get("data");
                     cameraScreenBinding.imagePreview.setVisibility(View.GONE);
                     cameraScreenBinding.imageView.setVisibility(View.VISIBLE);
-                    cameraScreenBinding.imageView.setImageBitmap(photo);
-                }else {
-                // Refreshing the gallery
-                CameraUtils.refreshGallery(getApplicationContext(), imageStoragePath);
+                    cameraScreenBinding.imageView.setImageBitmap(photo);*/
+                    Bitmap photo=(Bitmap) data.getExtras().get("data");
+                    Uri tempUri = getImageUri(getApplicationContext(), photo);
+                    // CALL THIS METHOD TO GET THE ACTUAL PATH
+                    performCrop(tempUri);
+                }
+                else {
+                    // Refreshing the gallery
+                    CameraUtils.refreshGallery(getApplicationContext(), imageStoragePath);
 
-                // successfully captured the image
-                // display it in image view
-                previewCapturedImage();}
+                    // successfully captured the image
+                    // display it in image view
+                    previewCapturedImage();}
             } else if (resultCode == RESULT_CANCELED) {
                 // user cancelled Image capture
                 Toast.makeText(getApplicationContext(),
@@ -426,7 +440,10 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
                         "Sorry! Failed to capture image", Toast.LENGTH_SHORT)
                         .show();
             }
-        } else if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
+        }
+
+
+        else if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Refreshing the gallery
                 CameraUtils.refreshGallery(getApplicationContext(), imageStoragePath);
@@ -444,6 +461,22 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(),
                         "Sorry! Failed to record video", Toast.LENGTH_SHORT)
                         .show();
+            }
+        }
+        else  if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                    cameraScreenBinding.imagePreview.setVisibility(View.GONE);
+                    cameraScreenBinding.imageView.setVisibility(View.VISIBLE);
+                    cameraScreenBinding.imageView.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
         }
     }

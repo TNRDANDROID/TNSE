@@ -83,4 +83,7 @@ dependencies {
     implementation 'android.arch.paging:runtime:1.0.1'
 
     implementation files('libs/volley.jar')
+
+    //Cropper Image
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
 }

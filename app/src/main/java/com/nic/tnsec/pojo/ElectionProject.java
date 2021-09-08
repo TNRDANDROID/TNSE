@@ -17,8 +17,18 @@ public class ElectionProject  {
 
     String empcode_type;
     String empcode_description;
+    String emp_image;
 
     String pp_id,name_of_staff,dept_org_name,gender,photo_available;
+
+    public String getEmp_image() {
+        return emp_image;
+    }
+
+    public ElectionProject setEmp_image(String emp_image) {
+        this.emp_image = emp_image;
+        return this;
+    }
 
     public String getPp_id() {
         return pp_id;

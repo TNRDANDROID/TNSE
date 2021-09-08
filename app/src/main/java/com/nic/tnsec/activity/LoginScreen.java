@@ -147,8 +147,8 @@ public LoginScreenBinding loginScreenBinding;
     }
 
     public void checkLoginScreen() {
-        loginScreenBinding.username.setText("ppdekpm01");
-        loginScreenBinding.password.setText("test123#$");
+        /*loginScreenBinding.username.setText("ppdekpm01");
+        loginScreenBinding.password.setText("test123#$");*/
 
         /*loginScreenBinding.username.setText("ppdevpm01");
         loginScreenBinding.password.setText("test123#$");*/
