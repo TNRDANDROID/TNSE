@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,7 +36,9 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 
 import com.android.volley.VolleyError;
@@ -44,6 +47,9 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mikelau.croperino.Croperino;
+import com.mikelau.croperino.CroperinoConfig;
+import com.mikelau.croperino.CroperinoFileUtil;
 import com.nic.tnsec.DataBase.DBHelper;
 import com.nic.tnsec.DataBase.dbData;
 import com.nic.tnsec.R;
@@ -62,7 +68,6 @@ import com.nic.tnsec.support.ProgressHUD;
 import com.nic.tnsec.utils.CameraUtils;
 import com.nic.tnsec.utils.UrlGenerator;
 import com.nic.tnsec.utils.Utils;
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -145,7 +150,8 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         anim.setRepeatCount(Animation.INFINITE);
         getEmpType();
         dashboardBinding.btnValidate.setOnClickListener(this);
-
+        new CroperinoConfig("IMG_" + System.currentTimeMillis() + ".jpg", "/MikeLau/Pictures", "/sdcard/MikeLau/Pictures");
+        CroperinoFileUtil.setupDirectory(Dashboard.this);
         dashboardBinding.typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -582,7 +588,10 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
 
     }
     private void captureImage() {
-        if (Build.VERSION.SDK_INT >= M) {
+        if (CroperinoFileUtil.verifyStoragePermissions(Dashboard.this)) {
+            prepareCamera();
+        }
+      /*  if (Build.VERSION.SDK_INT >= M) {
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
         }else {
@@ -599,7 +608,14 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
 
             // start the image capture Intent
             startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
-        }
+        }*/
+    }
+    private void prepareChooser() {
+        Croperino.prepareChooser(Dashboard.this, "Capture photo...", ContextCompat.getColor(Dashboard.this, android.R.color.background_dark));
+    }
+
+    private void prepareCamera() {
+        Croperino.prepareCamera(Dashboard.this);
     }
     private void requestCameraPermission(final int type) {
         Dexter.withActivity(this)
@@ -644,6 +660,97 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                 }).show();
     }
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case CroperinoConfig.REQUEST_TAKE_PHOTO:
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri i = Uri.fromFile(CroperinoFileUtil.getTempFile());
+                    // Capture Image
+                   /* dashboardBinding.empPhoto.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhotoSave.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhoto.setImageURI(i);
+                    File fdelete = new File(i.getPath());
+                    if (fdelete.exists()) {
+                        if (fdelete.delete()) {
+                            System.out.println("file Deleted :" + i.getPath());
+                        } else {
+                            System.out.println("file not Deleted :" + i.getPath());
+                        }
+                    }*/
+
+                   //Start Crop Image
+                    Croperino.runCropImage(CroperinoFileUtil.getTempFile(), Dashboard.this, true, 1, 1, R.color.gray, R.color.gray_variant);
+                }
+                break;
+            case CroperinoConfig.REQUEST_PICK_FILE:
+                if (resultCode == Activity.RESULT_OK) {
+                    CroperinoFileUtil.newGalleryFile(data, Dashboard.this);
+                    Croperino.runCropImage(CroperinoFileUtil.getTempFile(), Dashboard.this, true, 1, 1, R.color.gray, R.color.gray_variant);
+                }
+                break;
+            case CroperinoConfig.REQUEST_CROP_PHOTO:
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri i = Uri.fromFile(CroperinoFileUtil.getTempFile());
+                    dashboardBinding.empPhoto.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhotoSave.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhoto.setImageURI(i);
+                    File fdelete = new File(i.getPath());
+                    if (fdelete.exists()) {
+                        if (fdelete.delete()) {
+                            System.out.println("file Deleted :" + i.getPath());
+                        } else {
+                            System.out.println("file not Deleted :" + i.getPath());
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == CroperinoFileUtil.REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                int grantResult = grantResults[i];
+
+                if (permission.equals(Manifest.permission.CAMERA)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        prepareCamera();
+                    }
+                }
+            }
+        } else if (requestCode == CroperinoFileUtil.REQUEST_EXTERNAL_STORAGE) {
+            boolean wasReadGranted = false;
+            boolean wasWriteGranted = false;
+
+            for (int i = 0; i < permissions.length; i++) {
+                String permission = permissions[i];
+                int grantResult = grantResults[i];
+
+                if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        wasReadGranted = true;
+                    }
+                }
+                if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        wasWriteGranted = true;
+                    }
+                }
+            }
+
+            if (wasReadGranted && wasWriteGranted) {
+                prepareChooser();
+            }
+        }
+    }
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
         super.onActivityResult(requestCode, resultCode, data);
@@ -651,9 +758,12 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
             if (resultCode == RESULT_OK) {
                 if (Build.VERSION.SDK_INT >= M) {
                     Bitmap photo=(Bitmap) data.getExtras().get("data");
-                    Uri tempUri = getImageUri(getApplicationContext(), photo);
+                    *//*Uri tempUri = getImageUri(getApplicationContext(), photo);
                     // CALL THIS METHOD TO GET THE ACTUAL PATH
-                    performCrop(tempUri);
+                    performCrop(tempUri);*//*
+                    dashboardBinding.empPhoto.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhotoSave.setVisibility(View.VISIBLE);
+                    dashboardBinding.empPhoto.setImageBitmap(photo);
                 }
                 else {
                     // Refreshing the gallery
@@ -711,7 +821,7 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
                 Exception error = result.getError();
             }
         }
-    }
+    }*/
     private Uri getImageUri(Context applicationContext, Bitmap photo)
     {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -719,16 +829,18 @@ public class Dashboard extends AppCompatActivity implements MyDialog.myOnClickLi
         String path = MediaStore.Images.Media.insertImage(Dashboard.this.getContentResolver(), photo, "Title", null);
         return Uri.parse(path);
     }
+/*
     private void performCrop(Uri tempUri) {
         // take care of exceptions
         try{
-            CropImage.activity(tempUri).setAllowRotation(false).setAllowFlipping(false)
+            CropImage.activity(tempUri).setAllowRotation(true).setAllowFlipping(false)
                     .start(this);
         }
         catch (Exception e){
 
         }
     }
+*/
     public void previewCapturedImage() {
         try {
             // hide video preview

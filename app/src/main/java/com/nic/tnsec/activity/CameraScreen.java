@@ -53,7 +53,7 @@ import com.nic.tnsec.support.MyLocationListener;
 import com.nic.tnsec.utils.CameraUtils;
 import com.nic.tnsec.utils.UrlGenerator;
 import com.nic.tnsec.utils.Utils;
-import com.theartofdev.edmodo.cropper.CropImage;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -326,38 +326,13 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
 
     private void performCrop(Uri tempUri) {
         // take care of exceptions
-       /* try {
-            // call the standard crop action intent (the user device may not
-            // support it)
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            // indicate image type and Uri
-            cropIntent.setDataAndType(picUri, "image/*");
-            // set crop properties
-            cropIntent.putExtra("crop", "true");
-            // indicate aspect of desired crop
-            cropIntent.putExtra("aspectX", 2);
-            cropIntent.putExtra("aspectY", 1);
-            // indicate output X and Y
-            cropIntent.putExtra("outputX", 256);
-            cropIntent.putExtra("outputY", 256);
-            // retrieve data on return
-            cropIntent.putExtra("return-data", true);
-            // start the activity - we handle returning in onActivityResult
-            startActivityForResult(cropIntent, CROP_PIC);
-        }
-        // respond to users whose devices do not support the crop action
-        catch (ActivityNotFoundException anfe) {
-            Toast toast = Toast
-                    .makeText(this, "This device doesn't support the crop action!", Toast.LENGTH_SHORT);
-            toast.show();
-        }*/
-        try{
+       /* try{
             CropImage.activity(tempUri).setAllowRotation(false).setAllowFlipping(false)
                     .start(this);
         }
         catch (Exception e){
 
-        }
+        }*/
     }
 
     /*
@@ -462,7 +437,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
                         .show();
             }
         }
-        else  if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+       /* else  if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
@@ -477,7 +452,7 @@ public class CameraScreen extends AppCompatActivity implements View.OnClickListe
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
-        }
+        }*/
     }
 
     public void saveEmployeePhoto() {

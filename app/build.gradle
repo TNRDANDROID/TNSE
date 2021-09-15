@@ -85,5 +85,6 @@ dependencies {
     implementation files('libs/volley.jar')
 
     //Cropper Image
-    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+//    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+    implementation 'com.github.mike14u:croperino:1.1.8'
 }

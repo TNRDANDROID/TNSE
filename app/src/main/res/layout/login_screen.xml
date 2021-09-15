@@ -18,7 +18,7 @@
             android:background="@drawable/bottom_curved_color_bg"
             android:id="@+id/img_rll"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="180dp"
             >
             <ImageView
                 android:layout_width="match_parent"
@@ -127,14 +127,28 @@
                                 android:text="Tamil Nadu State Election Commission"
                                 android:textColor="@color/grey4"
                                 android:textSize="17sp"
-                                android:layout_marginTop="10dp"
+                                android:layout_marginTop="0dp"
+                                android:layout_marginBottom="10dp"
+                                android:textStyle="bold"
+                                customfontdemo:fontName="@string/font_circular_medium" />
+                            <TextView
+                                android:layout_gravity="center"
+                                android:id="@+id/dpt_local"
+                                android:layout_below="@+id/dpt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:text="Local Body Election 2021"
+                                android:textColor="@color/grey4"
+                                android:textSize="17sp"
+                                android:layout_marginTop="0dp"
                                 android:layout_marginBottom="10dp"
                                 android:textStyle="bold"
                                 customfontdemo:fontName="@string/font_circular_medium" />
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/submit_layout"
-                                android:layout_below="@+id/dpt"
+                                android:layout_below="@+id/dpt_local"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
@@ -166,7 +180,7 @@
                                             android:layout_marginStart="10dp"
                                             android:layout_marginEnd="10dp"                                    android:layout_marginTop="10dp"
                                             android:text="username"
-                                            android:textColor="@android:color/darker_gray"
+                                            android:textColor="@color/grey_10"
                                             android:textSize="15sp"
                                             android:visibility="visible"
                                             customfontdemo:fontName="@string/font_circular_medium" />
@@ -243,7 +257,7 @@
                                             android:layout_marginStart="10dp"
                                             android:layout_marginEnd="10dp"                                    android:layout_marginTop="10dp"
                                             android:text="password"
-                                            android:textColor="@android:color/darker_gray"
+                                            android:textColor="@color/grey_10"
                                             android:textSize="15sp"
                                             android:visibility="visible"
                                             customfontdemo:fontName="@string/font_circular_medium" />
